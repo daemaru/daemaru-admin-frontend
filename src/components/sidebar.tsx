@@ -1,17 +1,30 @@
+"use client"
+
 import Background from "../assets/imgs/backgroud.png";
 import Image from "next/image";
 import HamburgerIcon from "../assets/imgs/hamburger.svg";
 import CircleIcon from "../assets/imgs/circle.svg";
+import { useState } from "react";
+import Modal from "./modal";
 
 const Sidebar = () => {
+    const [openModal, setOpenModal] = useState<boolean>(false);
+
+    const toggleModal = () => {
+        setOpenModal((prev) => !prev);
+    }
+
     return (
         <div
-            className="flex flex-col w-fit h-screen bg-cover bg-center p-[30px] text-white"
+            className="relative flex flex-col w-fit h-screen bg-cover bg-center p-[30px] text-white"
             style={{
                 backgroundImage: `url(${Background.src})`,
             }}
         >
-            <Image src={HamburgerIcon} alt="" />
+            <div className="relative">
+                <Image src={HamburgerIcon} alt="" className="cursor-pointer" onClick={toggleModal}/>
+                {openModal && <Modal />}
+            </div>
             <div className="flex flex-col gap-[24px]">
                 <h3 className="text-4xl font-semibold mt-[95px]">대마루에서<br />일정을 관리해보세요</h3>
                 <p className="text-primary-orange-lightActive font-[500] text-[18px]">꾹 눌러서, 드래그!</p>
