@@ -6,6 +6,7 @@ import GoNext from "../assets/imgs/nextMonth.svg";
 import GoLast from "../assets/imgs/lastMonth.svg";
 import { changeDate } from "@/utils/getCalender";
 import EventModal from "@/components/main/eventModal";
+import EventList from "@/components/main/eventList";
 import { useState, useEffect } from "react";
 import React from "react";
 
@@ -16,6 +17,13 @@ export default function Home() {
   const [currentDate, setCurrentDate] = useState<number>(today.getDate());
   const [selectedDate, setSelectedDate] = useState<number | null>(null);
   const [modalPosition, setModalPosition] = useState<{ top: number; left: number }>({ top: 0, left: 0 });
+  const [eventData, setEventData] = useState({
+    newEventText: "",
+    description: "",
+    location: "",
+    time: "",
+    target: "",
+  });
 
   const monthsInEnglish = [
     "January", "February", "March", "April", "May", "June",
@@ -29,6 +37,13 @@ export default function Home() {
     const today = new Date();
     setCurrentDate(today.getDate());
     setSelectedDate(null);
+    setEventData({
+      newEventText: "",
+      description: "",
+      location: "",
+      time: "",
+      target: "",
+    });
   }, [month, year]);
 
   const getDate = (date: number, weekIndex: number) => {
@@ -72,18 +87,35 @@ export default function Home() {
   const handleDateClick = (date: number, weekIndex: number, event: React.MouseEvent<HTMLDivElement>) => {
     const isPrevMonth = weekIndex === 0 && date > 7;
     const isNextMonth = weekIndex > 3 && date <= 7;
-    
+
     if (date > 0 && !isPrevMonth && !isNextMonth) {
       setSelectedDate(date === selectedDate ? null : date);
+      setEventData({
+        newEventText: "",
+        description: "",
+        location: "",
+        time: "",
+        target: "",
+      });
+
       if (event.target) {
         const rect = (event.target as HTMLDivElement).getBoundingClientRect();
         setModalPosition({
-          top: rect.top + rect.height - 175, 
-          left: rect.left + 150, 
+          top: rect.top + rect.height - 175,
+          left: rect.left + 150,
         });
       }
     }
   };
+
+
+  const handleEventDataChange = (e: React.ChangeEvent<HTMLInputElement>, field: string) => {
+    setEventData({
+      ...eventData,
+      [field]: e.target.value,
+    });
+  };
+
 
   return (
     <div className="flex h-[100vh]">
@@ -129,7 +161,7 @@ export default function Home() {
                       {selectedDate === date && isCurrentMonth && (
                         <div className="absolute mt-[40px] w-[123px] flex-1 overflow-y-auto">
                           <div className="flex items-center mt-[2px] w-[100%] h-[20px] bg-primary-orange-normal rounded-[100px]">
-                            <p className="text-[12px] ml-[20px] text-primary-gray-white">New Event</p>
+                            <p className="text-[12px] pl-[10px] pr-[10px] text-primary-gray-white truncate">{eventData.newEventText || "New Event"}</p> 
                           </div>
                         </div>
                       )}
@@ -139,7 +171,9 @@ export default function Home() {
               </React.Fragment>
             ))}
           </div>
-          <div className="w-[24%] h-[90vh]"></div>
+          <div className="w-[24%] h-[90vh]">
+            <EventList />
+          </div>
         </div>
       </div>
       {selectedDate && (
@@ -147,7 +181,10 @@ export default function Home() {
           style={{ position: "absolute", top:  `${modalPosition.top}px`, left: `${modalPosition.left}px` }}
           className="z-50"
         >
-          <EventModal />
+          <EventModal
+              eventData={eventData}
+              onChange={handleEventDataChange}
+            />
         </div>
       )}
     </div>
