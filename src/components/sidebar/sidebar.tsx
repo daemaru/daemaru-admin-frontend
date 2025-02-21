@@ -8,7 +8,11 @@ import { useState } from "react";
 import Modal from "./modal";
 import Calender from "./calender/calender";
 
-const Sidebar = () => {
+interface SidebarProps {
+    className?: string;
+}
+
+const Sidebar: React.FC<SidebarProps> = ({ className }) => {
     const [openModal, setOpenModal] = useState<boolean>(false);
 
     const toggleModal = () => {
@@ -17,7 +21,7 @@ const Sidebar = () => {
 
     return (
         <div
-            className="relative flex flex-col w-fit h-screen bg-cover bg-center p-[30px] text-white"
+            className={`relative flex flex-col w-fit h-screen bg-cover bg-center p-[30px] text-white ${className}`}
             style={{
                 backgroundImage: `url(${Background.src})`,
             }}

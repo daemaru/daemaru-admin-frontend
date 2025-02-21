@@ -1,6 +1,6 @@
 const EventModal = () => {
     return (
-        <div className="relative flex flex-col h-[100%] border border-primary-orange-normal rounded-[14px] shadow-[0px_4px_10px_4px_rgba(48,48,48,0.12)] bg-white">
+        <div className="relative flex flex-col h-[200px] border border-primary-orange-normal rounded-[14px] shadow-[0px_4px_10px_4px_rgba(48,48,48,0.12)] bg-white">
             <div className="absolute left-[-10px] top-[50%] transform translate-y-[-50%] w-0 h-0 border-t-[10px] border-t-transparent border-r-[10px] border-r-primary-orange-normal border-b-[10px] border-b-transparent box-shadow-[-4px_0px_10px_0pxrgba(0,0,0,0.1)]" />
             <div className="absolute left-[-8.5px] top-[50%] transform translate-y-[-50%] w-0 h-0 border-t-[10px] border-t-transparent border-r-[10px] border-r-white border-b-[10px] border-b-transparent z-20" />
             <div className="flex flex-col w-[100%] p-[15px] border-b border-primary-orange-normal">
