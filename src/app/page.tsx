@@ -5,13 +5,14 @@ import Image from "next/image";
 import GoNext from "../assets/imgs/nextMonth.svg";
 import GoLast from "../assets/imgs/lastMonth.svg";
 import { changeDate } from "@/utils/getCalender";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import React from "react";
 
 export default function Home() {
   const today = new Date();
-  const [year] = useState<number>(today.getFullYear());
-  const [month] = useState<number>(today.getMonth() + 1);
+  const [year, setYear] = useState<number>(today.getFullYear());
+  const [month, setMonth] = useState<number>(today.getMonth() + 1);
+  const [currentDate, setCurrentDate] = useState<number>(today.getDate());
 
   const monthsInEnglish = [
     "January", "February", "March", "April", "May", "June",
@@ -19,18 +20,46 @@ export default function Home() {
   ];
   const daysOfWeek = ["월요일", "화요일", "수요일", "목요일", "금요일", "토요일", "일요일"];
 
-  const currentDate = today.getDate();
   const weeks = changeDate(year, month);
-  const lastDayOfMonth = new Date(year, month, 0).getDate();
 
-  const getDate = (date: number) => {
-    const isPrevOrNextMonth = date <= 0 || date > lastDayOfMonth;
-    const isToday = date === currentDate;
+  useEffect(() => {
+    const today = new Date();
+    setCurrentDate(today.getDate());
+  }, [month, year]); 
+
+  const getDate = (date: number, weekIndex: number, dateIndex: number) => {
+  
+    const isPrevMonth = weekIndex === 0 && date > 7; 
+    const isNextMonth = weekIndex > 3 && date <= 7;
+  
+    const isToday =
+      date === currentDate &&
+      month === today.getMonth() + 1 &&
+      year === today.getFullYear();
+  
     return `
       pt-[10px] pl-[20px] cursor-pointer border-t border-primary-gray-300
-      ${isPrevOrNextMonth ? "text-primary-gray-400 bg-primary-gray-50" : ""}
+      ${isPrevMonth || isNextMonth ? "text-primary-gray-400 bg-primary-gray-50" : ""}
       ${isToday ? "text-primary-orange-normal bg-primary-orange-light" : ""}
     `;
+  };
+
+  const handleNextMonth = () => {
+    if (month === 12) {
+      setMonth(1);
+      setYear(year + 1);
+    } else {
+      setMonth(month + 1);
+    }
+  };
+
+  const handleLastMonth = () => {
+    if (month === 1) {
+      setMonth(12);
+      setYear(year - 1);
+    } else {
+      setMonth(month - 1);
+    }
   };
 
   return (
@@ -42,10 +71,16 @@ export default function Home() {
             className="ml-[40px] w-[12px] cursor-pointer"
             src={GoLast}
             alt="<"
+            onClick={handleLastMonth}
           />
-          <Image className="w-[12px] cursor-pointer" src={GoNext} alt=">" />
+          <Image 
+            className="w-[12px] cursor-pointer" 
+            src={GoNext} 
+            alt=">"
+            onClick={handleNextMonth} 
+          />
           <p className="text-[28px] font-semibold text-primary-orange-normal">
-            {monthsInEnglish[today.getMonth()]}
+            {monthsInEnglish[month - 1]}
           </p>
         </div>
         <div className="w-full flex">
@@ -58,11 +93,9 @@ export default function Home() {
             {weeks.map((week, weekIndex) => (
               <React.Fragment key={weekIndex}>
                 {week.map((date, dateIndex) => (
-                  date > 0 && (
-                    <div key={dateIndex} className={getDate(date)}>
-                      {date}
-                    </div>
-                  )
+                  <div key={dateIndex} className={getDate(date, weekIndex, dateIndex)}>
+                    {date > 0 ? date : ""}
+                  </div>
                 ))}
               </React.Fragment>
             ))}
