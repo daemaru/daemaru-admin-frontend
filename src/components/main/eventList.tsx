@@ -1,6 +1,6 @@
 const EventList = () => {
     return (
-        <div className="flex flex-col gap-[30px] pt-[40px] pl-[20px] pr-[20px] pb-[40px] overflow-y-auto max-h-[90vh]">
+        <div className="flex flex-col gap-[30px] pt-[40px] pl-[20px] pr-[20px] pb-[40px] overflow-y-auto max-h-[90vh] min-w-[200px]">
             <div className="flex flex-col gap-[8px]">
                 <div className="flex items-center gap-[10px]">
                     <div className="w-[7px] h-[7px] bg-primary-orange-normal rounded-[50%]"/>
