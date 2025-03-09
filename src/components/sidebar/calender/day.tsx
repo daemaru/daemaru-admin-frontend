@@ -8,8 +8,9 @@ interface PropsType {
   const today = new Date()
   
   const Day = ({ date, week, month, year }: PropsType) => {
-    const isToday = today.toDateString() === new Date(year, month - 1, date).toDateString();
     const isInactive = (week === 0 && date >= 23) || (week >= 3 && date <= 6);
+    const isToday = !isInactive && today.toDateString() === new Date(year, month - 1, date).toDateString();
+
   
     return (
       <div
