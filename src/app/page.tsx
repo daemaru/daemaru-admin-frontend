@@ -22,6 +22,7 @@ export default function Home() {
   const [isDragging, setIsDragging] = useState(false);
   const [dragDates, setDragDates] = useState<number[]>([]);
 
+  // 이벤트 등록 모달 값들 정리
   const [eventData, setEventData] = useState({
     newEventText: "",
     description: "",
@@ -37,37 +38,49 @@ export default function Home() {
   const daysOfWeek = ["월요일", "화요일", "수요일", "목요일", "금요일", "토요일", "일요일"];
   const sampleEventData = [
     {
-      start: "2025-03-05", end: "2025-03-09", title: "금연예방교육" 
+      start: "2025-03-05", end: "2025-03-14", title: "금연예방교육" 
     },
     {
-      start: "2025-04-22", end: "2025-04-24", title: "오늘 저녁 뭐지"
+      start: "2025-04-22", end: "2025-04-29", title: "오늘 저녁 뭐지"
     },
   ]
 
+  // 일단은 필요 없을 듯
+  // interface eventDateListDatum {
+  //   starteDate : string,
+  //   endDate: string
+  // }
+
+  // sampleEventData 사용 시 필요
+  // 
+  // const getEventDateList = (start: string, end: string) => {
+  //   const startDate = new Date(start);
+  //   const endDate = new Date(end);
+  //   const eventDates: eventDateListDatum = {
+  //     starteDate: `${startDate.getFullYear()}-${(startDate.getMonth() + 1)
+  //                 .toString()
+  //                 .padStart(2, "0")}-${startDate.getDate().toString().padStart(2, "0")}`,
+  //     endDate: `${endDate.getFullYear()}-${(endDate.getMonth() + 1)
+  //                 .toString()
+  //                 .padStart(2, "0")}-${endDate.getDate().toString().padStart(2, "0")}`,
+  //   };
+  //   return eventDates;
+  // };
+
   const getEventDateList = (start: string, end: string) => {
-    const startDate = new Date(start);
-    const endDate = new Date(end);
-    const eventDates: string[] = [];
-  
-    while (startDate <= endDate) {
-      eventDates.push(
-        `${startDate.getFullYear()}-${(startDate.getMonth() + 1)
-          .toString()
-          .padStart(2, "0")}-${startDate.getDate().toString().padStart(2, "0")}`
-      );
-      startDate.setDate(startDate.getDate() + 1); 
-    }
+    return {starteDate: start, endDate: end}
+  }
 
-    return eventDates;
-  };
-
+  // sampleEventData에서 시작날짜, 끝날짜 받아와서 eventDateList에 저장
   const eventDateList = sampleEventData.flatMap(event => 
     getEventDateList(event.start, event.end)
-    
   );
 
+  // weeks는 주 별로 배열을 저장한 변수
   const weeks = changeDate(year, month);
-
+  
+  // 상태 업데이트 그냥 해주는건데
+  // 오늘 요일로 업데이트해주고 선택된 날짜 없을때 초기화 시켜주고 이벤트 모달 글자들 인풋 기준으로 업데이트
   useEffect(() => {
     const today = new Date();
     setCurrentDate(today.getDate());
@@ -81,8 +94,11 @@ export default function Home() {
     });
   }, [month, year]);
 
+  // 
   const getDate = (date: number, weekIndex: number, month: number, year: number) => {
+    // 저번달일 경우의 날짜는 어짜피 7일보다 클 수 밖에 없음
     const isPrevMonth = weekIndex === 0 && date > 7;
+    // 다음달일 경우의 날짜는 7일 이하
     const isNextMonth = weekIndex > 3 && date <= 7;
     const isCurrentMonth = !(isPrevMonth || isNextMonth);
 
@@ -94,9 +110,9 @@ export default function Home() {
       month === today.getMonth() + 1 &&
       year === today.getFullYear();
 
-    const fullDate = isCurrentMonth
-      ? `${year}-${month.toString().padStart(2, "0")}-${date.toString().padStart(2, "0")}`
-      : null;
+    // padStart로 3월 2일일때 03-02로 표시되는 날짜 형식을 맞춰둠
+    // fullDate 변수는 그 달의 날짜를 모두 저 형식으로 띄워줌
+    const fullDate = `${year}-${month.toString().padStart(2, "0")}-${date.toString().padStart(2, "0")}`
 
     return {
       className: `
@@ -109,6 +125,7 @@ export default function Home() {
     };
   };
 
+  // 다음달로 이동하는 함수
   const handleNextMonth = () => {
     if (month === 12) {
       setMonth(1);
@@ -118,6 +135,7 @@ export default function Home() {
     }
   };
 
+  // 전 달로 이동하는 함수
   const handleLastMonth = () => {
     if (month === 1) {
       setMonth(12);
@@ -127,15 +145,19 @@ export default function Home() {
     }
   };
 
+  // 날짜 선택했을 때 쓰이는 함수
   const handleDateClick = (date: number, weekIndex: number, event: React.MouseEvent<HTMLDivElement>) => {
     const { isCurrentMonth } = getDate(date, weekIndex, month, year);
 
+    // 일단 이번달이 아니면 이벤트 못하게 막아둠
     if (!isCurrentMonth) {
       event.preventDefault(); 
       return;
     }
 
+    // 날짜가 선택한 날짜면 그 날짜로 상태 업데이트, 아니면 null
     setSelectedDate(date === selectedDate ? date : null);
+    // 여기서도 모달 뜨니까 이벤트 등록 모달 상태 업데이트 시켜줌
     setEventData({
       newEventText: "",
       description: "",
@@ -144,6 +166,7 @@ export default function Home() {
       target: "",
     });
   
+    // 🧯🧯🧯 이부분 바꿔야함, 여기서 모달을 내 마우스가 끝난 위치랑 맞춰둬서 위에서 시작하면 그만큼 위에 모달이 뜸 🧯🧯🧯
     if (event.target) {
       const rect = (event.target as HTMLDivElement).getBoundingClientRect();
       setModalPosition({
@@ -153,6 +176,7 @@ export default function Home() {
     }
   };
   
+  // 이벤트 모달 텍스트들 상태 변경
   const handleEventDataChange = (e: React.ChangeEvent<HTMLInputElement>, field: string) => {
     setEventData({
       ...eventData,
@@ -160,28 +184,38 @@ export default function Home() {
     });
   };
 
+// 마우스 드레그 이벤트들 모음..!
   const handleMouseEvents = (date: number, weekIndex: number, event: React.MouseEvent<HTMLDivElement>, action: "down" | "move" | "up") => {
     const { isCurrentMonth } = getDate(date, weekIndex, month, year);
     if (!isCurrentMonth) return;
   
+    // 마우스 눌렀을때 이벤트
+    // isDragging true로 바구고 드레그 시작일자랑 선택일자 업데이트해주고 드레그된 날짜 모아놓는 배열에 날짜 넣어둠
     if (action === "down") {
       setIsDragging(true);
       setDragStartDate(date);
       setSelectedDate(date); 
       setDragDates([date]);
+    // 마우스 움직일때 이벤트
     } else if (action === "move") {
       if (dragStartDate !== null) {
         setDragEndDate(date);
+        // end랑 start는 math.min이랑 math.max써서 드레그 첫번째 날짜랑 끝내는 날짜 받아와서 저장
         const start = Math.min(dragStartDate, date);
         const end = Math.max(dragStartDate, date);
+        // range는 start가 3이고 end가 7이면 7-3+1 = 5가 length가 되는거임
+        // 첫번째 매개변수는 필요없어서 무시하고 i가 0부터 4까지 증가 -> [3, 4, 5, 6, 7]
         const range = Array.from({ length: end - start + 1 }, (_, i) => start + i);
-  
+
         setDragDates(range);
       }
+    // 마우스 드래그 끝날 때 이벤트
     } else if (action === "up" && isDragging) {
+      // 우선 isDragging false로 바꿔주고
       setIsDragging(false);
   
       if (dragStartDate !== null && dragEndDate !== null) {
+        // 이때 모달이 뜨니까 모달 관련 상태 업데이트 처리
         setEventData({
           newEventText: "",
           description: "",
@@ -190,54 +224,18 @@ export default function Home() {
           target: "",
         });
 
+         // 🧯🧯🧯 이부분 바꿔야함, 여기서 모달을 내 마우스가 끝난 위치랑 맞춰둬서 위에서 시작하면 그만큼 위에 모달이 뜸 🧯🧯🧯
         const rect = (event.target as HTMLDivElement).getBoundingClientRect();
         setModalPosition({
           top: rect.top + rect.height - 155,
           left: rect.left + 150,
         });
       }
+      // 상태 초기화
       setDragStartDate(null);
       setDragEndDate(null);
     }
   };
-
-  // const getWeekBoundaries = (weekDates: (number | string)[]) => {
-  //   const firstValidDate = weekDates.find((date) => date !== '') as number;
-  //   const weekStart = new Date(year, month -1, firstValidDate)
-  //   const weekEnd = new Date(weekStart);
-  //   weekEnd.setDate(weekStart.getDate() + 6);
-  //   return {weekStart, weekEnd};
-  // }
-
-  // const getWeekEvents = (weekDates: (number | string)[]) => {
-  //   if (!weekDates.some((date) => date !== "")) return []
-
-  //   const {weekStart, weekEnd} = getWeekBoundaries(weekDates)
-
-  //   return events.filter((event) => {
-  //     const eventStart = new Date(event.start);
-  //     const eventEnd = new Date(event.end)
-  //     return eventStart <= weekEnd && eventEnd >= weekStart
-  //   })
-  // }
-
-  // const calculateEventPosition = (event: Event, weekDates: (number | string)[]) => {
-  //   const { weekStart } = getWeekBoundaries(weekDates)
-  //   const eventStart = new Date(event.start)
-  //   const eventEnd = new Date(event.end)
-
-  //   const startOffset = Math.max(
-  //     0,
-  //     Math.floor((eventStart.getTime() - weekStart.getTime()) / (1000 * 60 * 60 * 24))
-  //   )
-
-  //   const duration = Math.min(
-  //     7 - startOffset,
-  //     Math.floor((eventEnd.getTime() - eventStart.getTime()) / (1000 * 60 * 60 * 24)) + 1
-  //   )
-
-  //   return { startOffset, duration }
-  // }
 
   return (
     <div className="flex h-[100vh]" onClick={() => setSelectedDate(null)} >
@@ -277,12 +275,31 @@ export default function Home() {
               <React.Fragment key={weekIndex}>
                 {week.map((date, dateIndex) => {
                   const { className, isCurrentMonth, fullDate } = getDate(date, weekIndex, month, year); 
+
+                  // eventDateList: 이벤트 시작날짜 끝날짜 받아와서 저장한거 (위에 있음)
+                  // 
                   const filteredEventDateList = eventDateList.filter(date => {
-                    const eventMonth = new Date(date).getMonth();
+                    // eventMonth: 시작날짜의 월을 구함
+                    const eventMonth = new Date(date.starteDate).getMonth();
                     return eventMonth === month - 1;
                   });
-                  const isFirstEventDay = fullDate === filteredEventDateList[0];
                   
+                  let isWeeksFirstEventDay
+                  let isLastWeekOfEnvent
+                  let leftDates = 0
+                  let barLength = 0
+                  
+                  if (filteredEventDateList.length > 0){
+                    const dateTypeFullDate = new Date(fullDate);
+                    isWeeksFirstEventDay = fullDate === filteredEventDateList[0].starteDate || 
+                    new Date(filteredEventDateList[0].starteDate) < dateTypeFullDate
+                      && dateTypeFullDate < new Date(filteredEventDateList[0].endDate)
+                      && dateTypeFullDate.getDay() === 1;
+                    isLastWeekOfEnvent = new Date(filteredEventDateList[0].endDate).getDate() - dateTypeFullDate.getDate() < 7
+                    leftDates = new Date(filteredEventDateList[0].endDate).getDate() - dateTypeFullDate.getDate() + 1
+                    barLength = (7 - new Date(fullDate).getDay() + 1)
+                  }
+
                   return (
                     <div key={dateIndex} className="relative flex flex-col">
                       <div
@@ -294,10 +311,10 @@ export default function Home() {
                       >
                         <p className="select-none">{date > 0 ? date : ""}</p>
                       </div>
-                      {isFirstEventDay && (
+                      {(isWeeksFirstEventDay && isCurrentMonth) && (
                         <div
                           className="cursor-pointer absolute mt-[40px] z-[1000] flex flex-col gap-[5px]"
-                          style={{width: (7 - new Date(fullDate).getDay() + 1) * 100 + '%'}}
+                          style={{width: isLastWeekOfEnvent ? leftDates * 100 + '%' : barLength * 100 + '%'}}
                         >
                           {sampleEventData
                             .filter((event) => {
@@ -317,12 +334,11 @@ export default function Home() {
                             ))}
                         </div>
                       )}
-
                       {selectedDate === date && isCurrentMonth && (
                         <div 
                           className="z-[1000] absolute mt-[40px]"
                             style={{
-                              width: dragDates.length * 100 + "%",
+                              width: isLastWeekOfEnvent ? dragDates.length * 100 + "%" : barLength * 100 + '%',
                             }}
                         >
                           <div 
@@ -353,7 +369,7 @@ export default function Home() {
       </div>
       {selectedDate && (
         <div 
-          style={{ zIndex: "2000", position: "absolute", top:  `${modalPosition.top}px`, left: `${modalPosition.left}px` }}
+          style={{ zIndex: "2000", position: "absolute", top: `${modalPosition.top}px`, left: `${modalPosition.left}px` }}
           className="z-50"
           onClick={(e) => e.stopPropagation()}
         >
@@ -366,4 +382,3 @@ export default function Home() {
     </div>
   );
 }
-
