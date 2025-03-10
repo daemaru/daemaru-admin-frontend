@@ -1,9 +1,39 @@
+"use client"
+
 import Header from "@/components/header";
 import RightArrow from "../../assets/imgs/rightArrow.svg";
 import LeftArrow from "../../assets/imgs/leftArrow.svg";
+import { ChangeEvent, useState } from "react";
+import { Cookie } from "@/utils/cookie";
+import { LoginRequest } from "@/apis/admins/type";
+import { login } from "@/apis/admins";
 import Image from "next/image";
 
 const Login = () => {
+    const [id, setId] = useState("");
+    const [password, setPassword] = useState("");
+
+    const onLoginChange = (e: ChangeEvent<HTMLInputElement>) => {
+        if (e.target.id === "password") {
+            setPassword(e.target.value)
+        } else if (e.target.id === "id") {
+            setId(e.target.value);
+        }
+    }
+
+    const handleLogin = async () => {
+        try {
+            const loginData: LoginRequest = { accountId: id, password }; 
+            const response = await login(loginData); 
+            const { token, refreshToken } = response.data; 
+    
+            Cookie.set("token", token);
+            Cookie.set("refreshToken", refreshToken);
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
     return (
         <div className="h-screen w-screen overflow-hidden bg-primary-gray-50">
             <Header />
@@ -20,18 +50,24 @@ const Login = () => {
                         <div className="flex flex-col gap-[6px]">
                             <p className="font-[700] text-[16px]">아이디</p>
                             <input
+                                id="id"
                                 className="w-full h-[48px] rounded-[12px] bg-[#EFF0F0] pl-[16px] font-[500] text-[16px]"
                                 type="text"
                                 placeholder="아이디"
+                                value={id}
+                                onChange={onLoginChange}
                             />
                         </div>
                         <div className="flex flex-col gap-[6px]">
                             <p className="font-[700] text-[16px]">비밀번호</p>
                             <div className="flex flex-col gap-[4px]">
                                 <input
+                                    id="password"
                                     className="w-full h-[48px] rounded-[12px] bg-[#EFF0F0] pl-[16px] font-[500] text-[16px]"
                                     type="password"
                                     placeholder="비밀번호"
+                                    value={password}
+                                    onChange={onLoginChange}
                                 />
                                 <div className="flex gap-[4px]">
                                     <span className="font-[500] text-[14px] text-primary-orange-dark">아이디가 없으시다면?</span>
@@ -40,7 +76,7 @@ const Login = () => {
                             </div>
                         </div>
                     </div>
-                    <button className="bg-primary-orange-normal w-[400px] h-[60px] rounded-[12px] font-semibold text-lg text-primary-gray-white mt-[50px]">
+                    <button onClick={handleLogin} className="bg-primary-orange-normal w-[400px] h-[60px] rounded-[12px] font-semibold text-lg text-primary-gray-white mt-[50px]">
                         <div className="flex items-center justify-center gap-[8px]">
                             <p>로그인</p>
                             <Image src={RightArrow} alt="arrow" />
