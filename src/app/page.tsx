@@ -166,7 +166,7 @@ export default function Home() {
       target: "",
     });
   
-    // 🧯🧯🧯 이부분 바꿔야함, 여기서 모달을 내 마우스가 끝난 위치랑 맞춰둬서 위에서 시작하면 그만큼 위에 모달이 뜸 🧯🧯🧯
+    // 🧯🧯🧯 이부분 바꿔야함, 여기서 모달을 뷰포트 기준으로 맞춰둬서 위에서 시작하면 그만큼 위에 모달이 뜸 🧯🧯🧯
     if (event.target) {
       const rect = (event.target as HTMLDivElement).getBoundingClientRect();
       setModalPosition({
@@ -224,7 +224,7 @@ export default function Home() {
           target: "",
         });
 
-         // 🧯🧯🧯 이부분 바꿔야함, 여기서 모달을 내 마우스가 끝난 위치랑 맞춰둬서 위에서 시작하면 그만큼 위에 모달이 뜸 🧯🧯🧯
+         // 🧯🧯🧯 이부분 바꿔야함, 여기서 모달을 뷰포트 기준으로 맞춰둬서 위에서 시작하면 그만큼 위에 모달이 뜸 🧯🧯🧯
         const rect = (event.target as HTMLDivElement).getBoundingClientRect();
         setModalPosition({
           top: rect.top + rect.height - 155,
@@ -277,7 +277,6 @@ export default function Home() {
                   const { className, isCurrentMonth, fullDate } = getDate(date, weekIndex, month, year); 
 
                   // eventDateList: 이벤트 시작날짜 끝날짜 받아와서 저장한거 (위에 있음)
-                  // 
                   const filteredEventDateList = eventDateList.filter(date => {
                     // eventMonth: 시작날짜의 월을 구함
                     const eventMonth = new Date(date.starteDate).getMonth();
