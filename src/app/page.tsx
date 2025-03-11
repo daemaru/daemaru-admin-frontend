@@ -8,6 +8,8 @@ import { changeDate } from "@/utils/getCalender";
 import EventModal from "@/components/main/eventModal";
 import EventList from "@/components/main/eventList";
 import { useState, useEffect } from "react";
+import { getSchedules } from "@/apis/schedules";
+import { getSchedulesResponseArray } from "@/apis/schedules/type";
 import React from "react";
 
 export default function Home() {
@@ -21,6 +23,7 @@ export default function Home() {
   const [dragEndDate, setDragEndDate] = useState<number | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [dragDates, setDragDates] = useState<number[]>([]);
+  const [schedules, setSchedules] = useState<getSchedulesResponseArray[]>([]);
 
   // 이벤트 등록 모달 값들 정리
   const [eventData, setEventData] = useState({
@@ -36,14 +39,6 @@ export default function Home() {
     "July", "August", "September", "October", "November", "December"
   ];
   const daysOfWeek = ["월요일", "화요일", "수요일", "목요일", "금요일", "토요일", "일요일"];
-  const sampleEventData = [
-    {
-      start: "2025-03-05", end: "2025-03-14", title: "금연예방교육" 
-    },
-    {
-      start: "2025-04-22", end: "2025-04-29", title: "오늘 저녁 뭐지"
-    },
-  ]
 
   // 일단은 필요 없을 듯
   // interface eventDateListDatum {
@@ -72,7 +67,7 @@ export default function Home() {
   }
 
   // sampleEventData에서 시작날짜, 끝날짜 받아와서 eventDateList에 저장
-  const eventDateList = sampleEventData.flatMap(event => 
+  const eventDateList = schedules.flatMap((event) =>
     getEventDateList(event.start, event.end)
   );
 
@@ -237,6 +232,18 @@ export default function Home() {
     }
   };
 
+  useEffect(() => {
+    const fetchSchedules = async () => {
+      try {
+        const { data } = await getSchedules();
+        setSchedules(data.schedules);
+      } catch (error) {
+        console.error("일정 데이터를 불러오는 중 오류 발생:", error);
+      }
+    };
+    fetchSchedules();
+  }, []);
+
   return (
     <div className="flex h-[100vh]" onClick={() => setSelectedDate(null)} >
       <Sidebar className="lg:block hidden" />
@@ -315,7 +322,7 @@ export default function Home() {
                           className="cursor-pointer absolute mt-[40px] z-[1000] flex flex-col gap-[5px]"
                           style={{width: isLastWeekOfEnvent ? leftDates * 100 + '%' : barLength * 100 + '%'}}
                         >
-                          {sampleEventData
+                          {schedules
                             .filter((event) => {
                               const eventMonth = new Date(event.start).getMonth();
                               return eventMonth === month - 1;
