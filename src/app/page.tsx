@@ -39,6 +39,27 @@ export default function Home() {
     "July", "August", "September", "October", "November", "December"
   ];
   const daysOfWeek = ["월요일", "화요일", "수요일", "목요일", "금요일", "토요일", "일요일"];
+  // const sampleEventData = [
+  //   {
+  //     start: "2025-03-05", end: "2025-03-14", title: "금연예방교육" 
+  //   },
+  //   {
+  //     start: "2025-04-22", end: "2025-04-29", title: "오늘 저녁 뭐지"
+  //   },
+  // ]
+
+  useEffect(() => {
+    const fetchSchedules = async () => {
+      try {
+        const { data } = await getSchedules();
+        setSchedules(data.schedules);
+      } catch (error) {
+        console.error("일정 조회 오류: ", error);
+      }
+    };
+
+    fetchSchedules();
+  }, []);
 
   // 일단은 필요 없을 듯
   // interface eventDateListDatum {
@@ -66,10 +87,11 @@ export default function Home() {
     return {starteDate: start, endDate: end}
   }
 
-  // sampleEventData에서 시작날짜, 끝날짜 받아와서 eventDateList에 저장
+  // eventDateList에서 시작날짜, 끝날짜 받아와서 eventDateList에 저장
   const eventDateList = schedules.flatMap((event) =>
     getEventDateList(event.start, event.end)
   );
+
 
   // weeks는 주 별로 배열을 저장한 변수
   const weeks = changeDate(year, month);
@@ -144,7 +166,6 @@ export default function Home() {
   const handleDateClick = (date: number, weekIndex: number, event: React.MouseEvent<HTMLDivElement>) => {
     const { isCurrentMonth } = getDate(date, weekIndex, month, year);
 
-    // 일단 이번달이 아니면 이벤트 못하게 막아둠
     if (!isCurrentMonth) {
       event.preventDefault(); 
       return;
@@ -160,15 +181,13 @@ export default function Home() {
       time: "",
       target: "",
     });
+
+    const rect = (event.currentTarget as HTMLDivElement).getBoundingClientRect();
   
-    // 🧯🧯🧯 이부분 바꿔야함, 여기서 모달을 뷰포트 기준으로 맞춰둬서 위에서 시작하면 그만큼 위에 모달이 뜸 🧯🧯🧯
-    if (event.target) {
-      const rect = (event.target as HTMLDivElement).getBoundingClientRect();
-      setModalPosition({
-        top: rect.top + rect.height - 155,
-        left: rect.left + 150,
-      });
-    }
+    setModalPosition({
+      top: rect.top + window.scrollY - 48, 
+      left: rect.left + rect.width + 20, 
+    });
   };
   
   // 이벤트 모달 텍스트들 상태 변경
@@ -219,30 +238,18 @@ export default function Home() {
           target: "",
         });
 
-         // 🧯🧯🧯 이부분 바꿔야함, 여기서 모달을 뷰포트 기준으로 맞춰둬서 위에서 시작하면 그만큼 위에 모달이 뜸 🧯🧯🧯
-        const rect = (event.target as HTMLDivElement).getBoundingClientRect();
-        setModalPosition({
-          top: rect.top + rect.height - 155,
-          left: rect.left + 150,
-        });
+         const rect = (event.currentTarget as HTMLDivElement).getBoundingClientRect();
+  
+         setModalPosition({
+           top: rect.top + window.scrollY - 48, 
+           left: rect.left + rect.width + 20, 
+         });
       }
       // 상태 초기화
       setDragStartDate(null);
       setDragEndDate(null);
     }
   };
-
-  useEffect(() => {
-    const fetchSchedules = async () => {
-      try {
-        const { data } = await getSchedules();
-        setSchedules(data.schedules);
-      } catch (error) {
-        console.error("일정 데이터를 불러오는 중 오류 발생:", error);
-      }
-    };
-    fetchSchedules();
-  }, []);
 
   return (
     <div className="flex h-[100vh]" onClick={() => setSelectedDate(null)} >
@@ -348,7 +355,7 @@ export default function Home() {
                             }}
                         >
                           <div 
-                            className="flex items-center mt-[2px] h-[20px] bg-primary-orange-normal rounded-[100px]"
+                            className="flex items-center mt-[2px] w-[100%] h-[20px] bg-primary-orange-normal rounded-[100px]"
                           >
                             <p className="text-[12px] pl-[10px] pr-[10px] text-primary-gray-white truncate select-none">
                               {eventData.newEventText || "New Event"}

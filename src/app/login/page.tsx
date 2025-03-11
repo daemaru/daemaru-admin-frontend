@@ -7,11 +7,13 @@ import { ChangeEvent, useState } from "react";
 import { Cookie } from "@/utils/cookie";
 import { LoginRequest } from "@/apis/admins/type";
 import { login } from "@/apis/admins";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 
 const Login = () => {
     const [id, setId] = useState("");
     const [password, setPassword] = useState("");
+    const router = useRouter();
 
     const onLoginChange = (e: ChangeEvent<HTMLInputElement>) => {
         if (e.target.id === "password") {
@@ -29,6 +31,7 @@ const Login = () => {
     
             Cookie.set("token", token);
             Cookie.set("refreshToken", refreshToken);
+            router.push('/');
         } catch (error) {
             console.error(error);
         }
