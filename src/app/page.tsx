@@ -327,7 +327,7 @@ export default function Home() {
                       {(isWeeksFirstEventDay && isCurrentMonth) && (
                         <div
                           className="cursor-pointer absolute mt-[40px] z-[1000] flex flex-col gap-[5px]"
-                          style={{width: isLastWeekOfEnvent ? leftDates * 100 + '%' : barLength * 100 + '%'}}
+                          style={{width: isLastWeekOfEnvent ? leftDates * 100 + '%' : barLength * 100 + '%', top: dragDates.includes(date) ? "25px" : "0px"}}
                         >
                           {schedules
                             .filter((event) => {
@@ -349,8 +349,9 @@ export default function Home() {
                       )}
                       {selectedDate === date && isCurrentMonth && (
                         <div 
-                          className="z-[1000] absolute mt-[40px]"
+                          className="z-[1001] absolute mt-[40px]"
                             style={{
+                              top: "0px",
                               width: isLastWeekOfEnvent ? dragDates.length * 100 + "%" : barLength * 100 + '%',
                             }}
                         >
@@ -376,7 +377,7 @@ export default function Home() {
               setSelectedDate(null); 
             }}
           >
-            <EventList />
+            <EventList selectedMonth={month}/>
           </div>
         </div>
       </div>
