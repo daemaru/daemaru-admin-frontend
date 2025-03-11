@@ -344,7 +344,8 @@ export default function Home() {
                                   {event.title}
                                 </p>
                               </div>
-                            ))}
+                            ))
+                          }
                         </div>
                       )}
                       {selectedDate === date && isCurrentMonth && (
