@@ -8,7 +8,7 @@ import { changeDate } from "@/utils/getCalender";
 import EventModal from "@/components/main/eventModal";
 import EventList from "@/components/main/eventList";
 import { useState, useEffect } from "react";
-import { getSchedules } from "@/apis/schedules";
+import { getSchedules, deleteSchedules } from "@/apis/schedules";
 import { getSchedulesResponseArray } from "@/apis/schedules/type";
 import React from "react";
 
@@ -61,6 +61,7 @@ export default function Home() {
     "일요일",
   ];
 
+  // 일정 조회 api 연동
   useEffect(() => {
     const fetchSchedules = async () => {
       try {
@@ -73,6 +74,17 @@ export default function Home() {
 
     fetchSchedules();
   }, []);
+
+  // 일정 삭제 로직
+  const handleDeleteKeyClick = async (e: React.KeyboardEvent<HTMLDivElement>, scheduleId: string) => {
+    if (e.key === 'Delete' || e.key === "Backspace") {
+      try {
+        await deleteSchedules(scheduleId);
+      } catch (error) {
+        console.error(error);
+      }
+    }
+  }
 
   // 일정의 날짜 범위를 올바르게 계산하는 함수로 수정
   const getEventDateRange = (start: string, end: string) => {
@@ -453,6 +465,8 @@ export default function Home() {
                                   width: `${barLength * 100}%`,
                                   top: `${25 + eventIndex * 25}px`,
                                 }}
+                                tabIndex={0}
+                                onKeyDown={(e) => handleDeleteKeyClick(e, event.id)}
                               >
                                 <div className="flex items-center mt-[2px] w-[100%] h-[20px] bg-primary-orange-lightActive rounded-[100px] gap-[6px] pl-[10px]">
                                   <div className="w-[7px] h-[7px] rounded-[100px] bg-primary-orange-normal flex-shrink-0" />

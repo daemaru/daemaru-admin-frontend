@@ -27,10 +27,9 @@ const Login = () => {
         try {
             const loginData: LoginRequest = { accountId: id, password }; 
             const response = await login(loginData); 
-            const { token, refreshToken } = response.data; 
+            const { accessToken } = response.data; 
     
-            Cookie.set("token", token);
-            Cookie.set("refreshToken", refreshToken);
+            Cookie.set("accessToken", accessToken);
             router.push('/');
         } catch (error) {
             console.error(error);
